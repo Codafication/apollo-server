@@ -41,6 +41,8 @@ export function graphqlExpress(
     res: express.Response,
     next,
   ): void => {
+    console.time('graphqlHandler');
+
     runHttpQuery([req, res], {
       method: req.method,
       options: options,
@@ -54,9 +56,11 @@ export function graphqlExpress(
         );
         res.write(gqlResponse);
         res.end();
+        console.timeEnd('graphqlHandler');
       },
       (error: HttpQueryError) => {
         if ('HttpQueryError' !== error.name) {
+          console.timeEnd('graphqlHandler');
           return next(error);
         }
 
@@ -69,6 +73,7 @@ export function graphqlExpress(
         res.statusCode = error.statusCode;
         res.write(error.message);
         res.end();
+        console.timeEnd('graphqlHandler');
       },
     );
   };
